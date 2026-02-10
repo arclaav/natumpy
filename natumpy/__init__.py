@@ -1,26 +1,26 @@
 from . import natcore
 
-class Nat:
-    def __init__(self, value, uncertainty=0.0, _ptr=None):
+class Paradox:
+    def __init__(self, value=None, _ptr=None):
         if _ptr:
             self._ptr = _ptr
+        elif value is not None:
+            self._ptr = natcore.create_chaos(float(value))
         else:
-            # Panggil fungsi C++ dari submodule
-            self._ptr = natcore.create_entity(float(value), float(uncertainty))
+            raise ValueError
 
     def __add__(self, other):
-        if not isinstance(other, Nat):
-            raise TypeError
-        new_ptr = natcore.entangle(self._ptr, other._ptr)
-        return Nat(0, 0, _ptr=new_ptr)
+        new_ptr = natcore.provoke(self._ptr, other._ptr)
+        return Paradox(_ptr=new_ptr)
 
-    def observe(self):
-        return natcore.collapse(self._ptr)
+    def possibilities(self):
+        return natcore.witness(self._ptr)
 
-    def state(self):
-        return natcore.inspect(self._ptr)
+    def collapse(self, mode="random"):
+        strategies = {"average": 0, "optimist": 1, "random": 2}
+        return natcore.force_choice(self._ptr, strategies.get(mode, 2))
 
     def __repr__(self):
-        s = self.state()
-        return f"Nat(mu={s['mu']:.4f}, sigma={s['sigma']:.4f}, entropy={s['entropy']:.4f})"
-
+        data = self.possibilities()
+        count = len(data['potentials'])
+        return f"<Paradox | {count} Realities | Chaos Level: {data['chaos_level']}>"
