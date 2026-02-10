@@ -1,26 +1,20 @@
 from . import natcore
 
-class Paradox:
-    def __init__(self, value=None, _ptr=None):
-        if _ptr:
-            self._ptr = _ptr
-        elif value is not None:
-            self._ptr = natcore.create_chaos(float(value))
-        else:
-            raise ValueError
+class NatEnvironment:
+    def __init__(self):
+        self._sys = natcore.create_system()
 
-    def __add__(self, other):
-        new_ptr = natcore.provoke(self._ptr, other._ptr)
-        return Paradox(_ptr=new_ptr)
+    def inject(self, value, uncertainty=0.1):
+        natcore.inject_data(self._sys, float(value), float(uncertainty))
 
-    def possibilities(self):
-        return natcore.witness(self._ptr)
+    def evolve(self, cycles=1):
+        natcore.run_cycle(self._sys, int(cycles))
 
-    def collapse(self, mode="random"):
-        strategies = {"average": 0, "optimist": 1, "random": 2}
-        return natcore.force_choice(self._ptr, strategies.get(mode, 2))
+    def observe(self):
+        data = natcore.get_state(self._sys)
+        return sorted(data, key=lambda x: x['stability'], reverse=True)
 
     def __repr__(self):
-        data = self.possibilities()
-        count = len(data['potentials'])
-        return f"<Paradox | {count} Realities | Chaos Level: {data['chaos_level']}>"
+        state = self.observe()
+        return f"<NatEnvironment | Population: {len(state)} | Max Stability: {state[0]['stability'] if state else 0.0:.2f}>"
+
