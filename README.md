@@ -1,0 +1,2 @@
+# natumpy
+result eksperimen numerik
