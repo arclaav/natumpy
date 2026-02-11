@@ -1,20 +1,19 @@
+import numpy as np
 from . import natcore
 
-class NatEnvironment:
-    def __init__(self):
-        self._sys = natcore.create_system()
+NatField = natcore.NatField
 
-    def inject(self, value, uncertainty=0.1):
-        natcore.inject_data(self._sys, float(value), float(uncertainty))
+NAT_DTYPE = np.dtype([
+    ('value', np.float64),
+    ('velocity', np.float64),
+    ('mass', np.float64),
+    ('damping', np.float64),
+    ('target', np.float64)
+])
 
-    def evolve(self, cycles=1):
-        natcore.run_cycle(self._sys, int(cycles))
+def create_field(size):
+    return NatField(int(size))
 
-    def observe(self):
-        data = natcore.get_state(self._sys)
-        return sorted(data, key=lambda x: x['stability'], reverse=True)
-
-    def __repr__(self):
-        state = self.observe()
-        return f"<NatEnvironment | Population: {len(state)} | Max Stability: {state[0]['stability'] if state else 0.0:.2f}>"
+def view(field):
+    return np.array(field, copy=False)
 
