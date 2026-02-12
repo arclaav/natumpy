@@ -1,0 +1,11 @@
+LICENSE
+README.md
+pyproject.toml
+setup.py
+natumpy/__init__.py
+natumpy/natcore.cpp
+natumpy.egg-info/PKG-INFO
+natumpy.egg-info/SOURCES.txt
+natumpy.egg-info/dependency_links.txt
+natumpy.egg-info/requires.txt
+natumpy.egg-info/top_level.txt

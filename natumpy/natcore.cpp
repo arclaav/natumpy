@@ -4,9 +4,9 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-#include <limits>
 #include <new>
 #include <mutex>
+#include <stdexcept>
 
 struct NatAtom {
     double value;
@@ -49,11 +49,7 @@ public:
     void set_target(size_t idx, double t) {
         std::lock_guard<std::mutex> lock(mtx);
         if (idx < atoms.size()) {
-            if (std::isfinite(t)) {
-                atoms[idx].target = t;
-            } else {
-                atoms[idx].target = 0.0;
-            }
+            atoms[idx].target = std::isfinite(t) ? t : 0.0;
         }
     }
 
@@ -115,35 +111,47 @@ typedef struct {
 static void NatField_dealloc(PyNatField* self) {
     if (self->engine) {
         delete self->engine;
+        self->engine = nullptr;
     }
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static PyObject* NatField_new(PyTypeObject* type, PyObject* args, PyObject* kwds) {
     PyNatField* self = (PyNatField*)type->tp_alloc(type, 0);
-    int size = 100;
+    Py_ssize_t size = 100;
+
     if (self != NULL) {
-        if (!PyArg_ParseTuple(args, "|i", &size)) return NULL;
-        self->engine = new NatFieldEngine(size);
-        self->shape[0] = self->engine->atoms.size();
-        self->strides[0] = sizeof(NatAtom);
+        if (!PyArg_ParseTuple(args, "|n", &size)) {
+            Py_DECREF(self);
+            return NULL;
+        }
+
+        try {
+            self->engine = new NatFieldEngine((size_t)size);
+            self->shape[0] = (Py_ssize_t)self->engine->atoms.size();
+            self->strides[0] = sizeof(NatAtom);
+        } catch (...) {
+            PyErr_SetString(PyExc_MemoryError, "Failed to allocate engine");
+            Py_DECREF(self);
+            return NULL;
+        }
     }
     return (PyObject*)self;
 }
 
 static PyObject* NatField_set_props(PyNatField* self, PyObject* args) {
-    int idx;
+    Py_ssize_t idx;
     double m, d;
-    if (!PyArg_ParseTuple(args, "idd", &idx, &m, &d)) return NULL;
-    self->engine->set_properties(idx, m, d);
+    if (!PyArg_ParseTuple(args, "ndd", &idx, &m, &d)) return NULL;
+    if (self->engine) self->engine->set_properties((size_t)idx, m, d);
     Py_RETURN_NONE;
 }
 
 static PyObject* NatField_set_target(PyNatField* self, PyObject* args) {
-    int idx;
+    Py_ssize_t idx;
     double t;
-    if (!PyArg_ParseTuple(args, "id", &idx, &t)) return NULL;
-    self->engine->set_target(idx, t);
+    if (!PyArg_ParseTuple(args, "nd", &idx, &t)) return NULL;
+    if (self->engine) self->engine->set_target((size_t)idx, t);
     Py_RETURN_NONE;
 }
 
@@ -152,26 +160,28 @@ static PyObject* NatField_step(PyNatField* self, PyObject* args) {
     double dt = 0.1;
     if (!PyArg_ParseTuple(args, "i|d", &cycles, &dt)) return NULL;
     
-    Py_BEGIN_ALLOW_THREADS
-    self->engine->step_physics(cycles, dt);
-    Py_END_ALLOW_THREADS
+    if (self->engine) {
+        Py_BEGIN_ALLOW_THREADS
+        self->engine->step_physics(cycles, dt);
+        Py_END_ALLOW_THREADS
+    }
     
     Py_RETURN_NONE;
 }
 
 static PyObject* NatField_resonate(PyNatField* self, PyObject* args) {
-    int i1, i2;
+    Py_ssize_t i1, i2;
     double strength;
-    if (!PyArg_ParseTuple(args, "iid", &i1, &i2, &strength)) return NULL;
-    self->engine->resonate(i1, i2, strength);
+    if (!PyArg_ParseTuple(args, "nnd", &i1, &i2, &strength)) return NULL;
+    if (self->engine) self->engine->resonate((size_t)i1, (size_t)i2, strength);
     Py_RETURN_NONE;
 }
 
 static PyObject* NatField_force(PyNatField* self, PyObject* args) {
-    int idx;
+    Py_ssize_t idx;
     double v;
-    if (!PyArg_ParseTuple(args, "id", &idx, &v)) return NULL;
-    self->engine->force_state(idx, v);
+    if (!PyArg_ParseTuple(args, "nd", &idx, &v)) return NULL;
+    if (self->engine) self->engine->force_state((size_t)idx, v);
     Py_RETURN_NONE;
 }
 
@@ -181,7 +191,10 @@ static PyObject* NatField_size(PyNatField* self, PyObject* args) {
 }
 
 static int NatField_getbuffer(PyNatField *self, Py_buffer *view, int flags) {
-    if (self->engine == NULL) return -1;
+    if (self->engine == NULL) {
+        PyErr_SetString(PyExc_ValueError, "Engine NULL");
+        return -1;
+    }
     
     view->obj = (PyObject*)self;
     Py_INCREF(view->obj);
@@ -211,18 +224,21 @@ static PyMethodDef NatField_methods[] = {
     {NULL}
 };
 
+static PyBufferProcs NatField_buffer_procs = {
+    (getbufferproc)NatField_getbuffer,
+    (releasebufferproc)NatField_releasebuffer
+};
+
 static PyTypeObject PyNatFieldType = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "natcore.NatField",
-    sizeof(PyNatField),
-    0,
-    (destructor)NatField_dealloc,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
-    0, 0, 0, 0, 0, 0, 0,
-    NatField_methods,
-    0, 0, 0, 0, 0, 0, 0,
-    0,
+    .tp_name = "natcore.NatField",
+    .tp_basicsize = sizeof(PyNatField),
+    .tp_itemsize = 0,
+    .tp_dealloc = (destructor)NatField_dealloc,
+    .tp_as_buffer = &NatField_buffer_procs,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+    .tp_methods = NatField_methods,
+    .tp_new = NatField_new,
 };
 
 static struct PyModuleDef natcoremodule = {
@@ -236,13 +252,6 @@ static struct PyModuleDef natcoremodule = {
 PyMODINIT_FUNC PyInit_natcore(void) {
     PyObject* m;
     
-    static PyBufferProcs buffer_procs;
-    buffer_procs.bf_getbuffer = (getbufferproc)NatField_getbuffer;
-    buffer_procs.bf_releasebuffer = (releasebufferproc)NatField_releasebuffer;
-    PyNatFieldType.tp_as_buffer = &buffer_procs;
-    
-    PyNatFieldType.tp_new = (newfunc)NatField_new;
-
     if (PyType_Ready(&PyNatFieldType) < 0) return NULL;
 
     m = PyModule_Create(&natcoremodule);
