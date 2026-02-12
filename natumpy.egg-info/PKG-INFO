@@ -1,9 +1,0 @@
-Metadata-Version: 2.4
-Name: natumpy
-Version: 3.1.0
-Requires-Python: >=3.8
-License-File: LICENSE
-Requires-Dist: numpy>=1.20.0
-Dynamic: license-file
-Dynamic: requires-dist
-Dynamic: requires-python
