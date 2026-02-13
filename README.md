@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python: 3.8+](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
 [![Architecture: Nawa](https://img.shields.io/badge/Architecture-Complex%20Valued-purple)]()
