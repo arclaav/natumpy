@@ -25,7 +25,6 @@ We do not use simple Euler integration. Nawa employs a **Semi-Implicit Symplecti
 
 ### 3. Struct of Arrays (SoA)
 Optimized for modern CPU Cache and SIMD (Single Instruction, Multiple Data). Data is separated into contiguous memory blocks (`q_r`, `q_i`, `p_r`, `p_i`) ensuring maximum throughput during physics stepping.
-=======
 # NATUMPY
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
