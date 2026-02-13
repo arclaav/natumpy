@@ -1,19 +1,13 @@
 import numpy as np
 from . import natcore
 
-NatField = natcore.NatField
+NawaEngine = natcore.NawaEngine
 
-NAT_DTYPE = np.dtype([
-    ('value', np.float64),
-    ('velocity', np.float64),
-    ('mass', np.float64),
-    ('damping', np.float64),
-    ('target', np.float64)
-])
+def create_engine(size):
+    return NawaEngine(int(size))
 
-def create_field(size):
-    return NatField(int(size))
-
-def view(field):
-    return np.array(field, copy=False).view(NAT_DTYPE)
+def get_state_complex(engine):
+    real = engine.q_r
+    imag = engine.q_i
+    return real + 1j * imag
 

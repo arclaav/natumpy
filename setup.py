@@ -14,7 +14,11 @@ if sys.platform == 'darwin':
 
 module = Extension(
     'natumpy.natcore',
-    sources=['natumpy/natcore.cpp'],
+    sources=[
+        'natumpy/nat_bindings.cpp',
+        'natumpy/nat_engine.cpp'
+    ],
+    depends=['natumpy/nat_engine.hpp'],
     include_dirs=np_include,
     extra_compile_args=extra_compile_args,
     language='c++'
@@ -22,7 +26,7 @@ module = Extension(
 
 setup(
     name='natumpy',
-    version='3.1.0',
+    version='4.0.0',
     packages=find_packages(),
     ext_modules=[module],
     python_requires='>=3.8',
