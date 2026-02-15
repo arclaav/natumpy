@@ -14,6 +14,9 @@ class BaseLayer:
 
     def step(self, r, i):
         self.engine.step(r, i)
+        
+    def set_config(self, beta, dt, stiffness, decay):
+        pass
 
 class ReservoirLayer(BaseLayer):
     def forward(self, input_r, input_i):
@@ -34,7 +37,7 @@ class ReadoutLayer:
         self.W_out = None
         
     def fit(self, X_states, Y_targets):
-        print(f"   [Readout] Melatih W_out ({X_states.shape} >> {Y_targets.shape})...")
+        print(f"   [Readout] Melatih W_out ({X_states.shape} -> {Y_targets.shape})...")
         
         A = X_states.T @ X_states + self.alpha * np.eye(X_states.shape[1])
         B = X_states.T @ Y_targets
@@ -43,17 +46,17 @@ class ReadoutLayer:
             self.W_out = np.linalg.solve(A, B)
             print("   [Readout] Solusi Exact ditemukan.")
         except np.linalg.LinAlgError:
-            print("   [Readout] Matrix Singular. Menggunakan PseudoInverse.")
+            print("   [Readout] Matrix Singular. Menggunakan Pseudo-Inverse.")
             self.W_out = np.linalg.pinv(A) @ B
             
     def predict(self, state_vec):
         if self.W_out is None:
-            raise ValueError("Readout belum dilatih, Panggil .fit() dulu.")
+            raise ValueError("Readout belum dilatih! Panggil .fit() dulu.")
         return state_vec @ self.W_out
 
     def save(self, filename):
-        np.save(filename, self.W_out)
+        if self.W_out is not None:
+            np.save(filename, self.W_out)
         
     def load(self, filename):
         self.W_out = np.load(filename)
-
