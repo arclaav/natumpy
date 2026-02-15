@@ -1,0 +1,187 @@
+Metadata-Version: 2.4
+Name: natumpy
+Version: 5.0.7
+Summary: Nawa Causal Engine: Complex-Valued Reservoir Computing based on Harmonic Resonance.
+Home-page: https://github.com/arclaav/natumpy
+Author: Eternals
+Author-email: admin@defacer.cloud-ip.cc
+Keywords: ai,reservoir-computing,esn,complex-valued,neural-network,c++,nawa
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Programming Language :: C++
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy>=1.20.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
+[![Architecture](https://img.shields.io/badge/Architecture-Nawa%20Harmonic-purple)](https://github.com/eternals/natumpy)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
+
+> **"God does not play dice." — Albert Einstein**
+> 
+> **"Neither does Natumpy." — Eternals**
+
+**Natumpy** adalah framework kecerdasan buatan berbasis **Fisika Gelombang (Harmonic Resonance)** dan **Reservoir Computing**. 
+Berbeda dengan arsitektur Transformer (GPT/LLM) yang mengandalkan probabilitas statistik (dadu) dan memori *KV-Cache* yang boros, Natumpy menggunakan prinsip deterministik aljabar linear dan sinyal kompleks (fase & amplitudo) untuk memodelkan kognisi yang "Cair" (*Liquid*).
+
+---
+
+## Mengapa Begitu?
+
+Dominasi Transformer saat ini memiliki kelemahan fundamental: **Inefisiensi Energi & Halusinasi**. Natumpy hadir sebagai antitesis dengan pendekatan biomimetik.
+
+| Fitur | Transformer (GPT-4) | **Natumpy (Nawa)** |
+| :--- | :--- | :--- |
+| **Filosofi** | Probabilitas Statistik | **Resonansi Fisika** |
+| **Logika** | "Menebak" kata selanjutnya | **"Mengalir"** ke ekuilibrium |
+| **Kompleksitas** | $O(N^2)$ (Berat di teks panjang) | **$O(N)$ (Linear / Sangat Cepat)** |
+| **Representasi** | Bilangan Real (Skalar) | **Bilangan Kompleks (Vektor Fasa)** |
+| **Memori** | KV-Cache (Boros RAM) | **Holographic State (Efisien)** |
+| **Training** | Backpropagation (Butuh GPU Sultan) | **Ridge Regression (Bisa di Laptop)** |
+
+---
+
+## Arsitektur "NAWA" (9 Spheres)
+
+Natumpy dibangun di atas struktur **C++ High-Performance** yang mengimplementasikan **Harmonic Hierarchy**:
+
+### 1.  **NAT (Liquid State):** Neuron tidak statis. Bobotnya bersifat "cair" (*liquid time-constant*), bereaksi terhadap input secara real-time dan memiliki inersia memori.
+### 2.  **NAWA (9 Lapisan Waktu):** Otak Natumpy terdiri dari 9 bola resonansi yang berjalan pada frekuensi waktu yang berbeda ($2^0$ hingga $2^8$).
+* **Layer 0 (Refleks):** Detak cepat (1ms). Menangkap detail input sensorik.
+* **Layer 4 (Kognisi):** Detak sedang. Memahami kata dan konsep.
+* **Layer 8 (Kesadaran):** Detak lambat (256ms). Menyimpan konteks global dan jati diri, mencegah halusinasi jangka pendek.
+
+
+
+---
+
+# Instalasi
+
+Pastikan Anda memiliki compiler C++17 (GCC/Clang/MSVC) dan Python 3.8+.
+
+```
+# Clone repository
+git clone https://github.com/eternalys/natumpy.git
+cd natumpy
+```
+```
+# Install (Compiling C++ Core secara otomatis)
+pip install .
+```
+# Memulai (Quick Start)
+## 1. Hello Resonance
+Melihat bagaimana Natumpy merespons sinyal input di level sinyal (Gelombang).
+```
+import natumpy as nt
+import numpy as np
+
+# Inisialisasi Engine 2048 Dimensi
+engine = nt.create_engine(2048)
+
+# Buat Sinyal Input (Vektor Kompleks)
+# Input Real (0.5) dan Imaginer (0.1)
+in_r = np.full(2048, 0.5)
+in_i = np.full(2048, 0.1)
+
+# Step Fisika (Berpikir 1 langkah)
+engine.step(in_r, in_i)
+
+# Intip isi otak (Layer 0)
+state = nt.get_state_complex(engine, layer_idx=0)
+print(f"Energi Otak: {np.mean(np.abs(state)):.4f}")
+```
+## 2. Membangun Chatbot (Reservoir Computing)
+Pola desain Natumpy memisahkan Otak (Reservoir) dan Mulut (Readout).
+ * Otak (C++) bertugas menghasilkan pola gelombang rumit di dimensi tinggi (Chaos).
+ * Mulut (Python) dilatih sederhana untuk menerjemahkan gelombang itu menjadi kata-kata.
+```
+import natumpy as nat
+import numpy as np
+
+# --- SETUP ---
+DIM = 2048
+otak = nat.ReservoirLayer(DIM)
+mulut = nat.ReadoutLayer(input_dim=DIM*4, output_dim=DIM*2) # 4 Layer Features
+tokenizer = nat.text.ResonantTokenizer(DIM)
+
+TEXT = "Natumpy adalah kecerdasan buatan masa depan yang efisien."
+
+# --- FASE 1: MENDENGAR (Rekam Gelombang Otak) ---
+X_states = []
+Y_targets = []
+
+# Encode Teks ke Gelombang
+inputs_r, inputs_i = tokenizer.encode(TEXT)
+targets_r, targets_i = tokenizer.encode(TEXT[1:] + " ") # Prediksi huruf selanjutnya
+
+print("Sedang membaca...")
+for t in range(len(inputs_r)):
+    # 1. Masukkan suara ke otak
+    state = otak.forward(inputs_r[t], inputs_i[t])
+    X_states.append(state)
+    
+    # 2. Siapkan target jawaban
+    target_vec = np.concatenate([targets_r[t], targets_i[t]])
+    Y_targets.append(target_vec)
+
+# --- FASE 2: BELAJAR BICARA (Linear Algebra) ---
+# Tidak ada epoch ribuan kali. Satu kali hitung (Exact Solution).
+mulut.fit(np.array(X_states), np.array(Y_targets))
+
+# --- FASE 3: GENERASI ---
+print("Output:", end=" ")
+# Seed awal
+pr, pi = tokenizer.encode("Natumpy")
+for i in range(len(pr)): otak.forward(pr[i], pi[i])
+
+# Biarkan dia bicara sendiri (Feedback Loop)
+curr_r, curr_i = pr[-1], pi[-1]
+for _ in range(50):
+    # Ambil state -> Terjemahkan lewat mulut -> Decode jadi huruf
+    state = otak.get_state()
+    pred_vec = mulut.predict(state)
+    
+    pred_r = pred_vec[:DIM]
+    pred_i = pred_vec[DIM:]
+    char = tokenizer.decode_sequence([pred_r], [pred_i])
+    
+    print(char, end="", flush=True)
+    
+    # Suara masuk kembali ke telinga (Auto-Regressive)
+    idx = tokenizer.decode(pred_r, pred_i)
+    next_r = tokenizer.embeddings_r[idx]
+    next_i = tokenizer.embeddings_i[idx]
+    otak.forward(next_r, next_i)
+```
+# Komponen Library
+ * natumpy.natcore: C++ Binding (Jantung Fisika). Jangan dimodifikasi kecuali Anda paham Aljabar Linear Kompleks.
+ * natumpy.layers: Abstraksi Python (ReservoirLayer, ReadoutLayer). Memudahkan pembuatan model.
+ * natumpy.text: Resonant Tokenizer. Mengubah teks menjadi gelombang tanpa kamus kata (Byte-level processing).
+ * natumpy.model: Wadah untuk menyusun arsitektur Deep Learning (Stacking Layers).
+# Kontribusi
+Proyek ini adalah eksperimen ilmiah terbuka. Kami mencari kontributor di bidang:
+ * Geometric Algebra: Untuk upgrade v9.0 (Multivectors / Clifford Algebra).
+ * Optimization: Implementasi CUDA/OpenMP untuk C++ Core agar mendukung jutaan neuron.
+ * Linguistics: Memperbaiki topologi semantik pada Tokenizer.
+# Lisensi
+MIT License
+Copyright (c) 2026 Eternals.
+
+

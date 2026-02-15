@@ -38,7 +38,7 @@ module = Extension(
 
 setup(
     name='natumpy',
-    version='1.0.1',
+    version='5.0.7',
     packages=find_packages(),
     ext_modules=[module],
     python_requires='>=3.8',
